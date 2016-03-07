@@ -1,2 +1,2 @@
 # viff-client
-viff language binding
+viff Java language binding
