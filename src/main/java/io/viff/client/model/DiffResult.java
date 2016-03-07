@@ -1,8 +1,6 @@
-package io.viff.client;
+package io.viff.client.model;
 
-/**
- * Created by tbzhang on 3/7/16.
- */
+
 public class DiffResult {
     private String originImageUrl;
     private String targetImageUrl;

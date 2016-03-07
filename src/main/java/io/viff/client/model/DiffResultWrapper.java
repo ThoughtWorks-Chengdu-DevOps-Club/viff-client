@@ -1,10 +1,8 @@
-package io.viff.client;
+package io.viff.client.model;
 
 import java.util.List;
 
-/**
- * Created by tbzhang on 3/7/16.
- */
+
 public class DiffResultWrapper {
     private String currentTag;
     private String currentBuildNumber;
