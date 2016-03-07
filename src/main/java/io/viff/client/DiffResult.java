@@ -6,6 +6,7 @@ package io.viff.client;
 public class DiffResult {
     private String originImageUrl;
     private String targetImageUrl;
+    private String diffImageUrl;
     private boolean isSame;
     private double similarity;
 
@@ -39,5 +40,13 @@ public class DiffResult {
 
     public void setSimilarity(double similarity) {
         this.similarity = similarity;
+    }
+
+    public String getDiffImageUrl() {
+        return diffImageUrl;
+    }
+
+    public void setDiffImageUrl(String diffImageUrl) {
+        this.diffImageUrl = diffImageUrl;
     }
 }
