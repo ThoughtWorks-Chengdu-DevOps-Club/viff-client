@@ -33,8 +33,19 @@ public class ViffClient {
             throw new RuntimeException("Need setting web driver before take screenshot!!");
         }
 
+        takeScreenshot();
+
+        uploadScreenshot();
+    }
+
+
+    private void takeScreenshot() throws IOException {
         File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         FileUtils.copyFile(screenshot, new File("temp.png"));
+    }
+
+    private void uploadScreenshot() {
+        // TODO upload
     }
 
     public DiffResultWrapper viff(String targetTag, int targetBuildNumber){
