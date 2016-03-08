@@ -13,13 +13,11 @@ import java.io.IOException;
 
 public class ViffClient {
 
-    private Resolution resolution;
     private int projectId;
     private String tag;
     private WebDriver driver;
 
-    public ViffClient(Resolution resolution, int projectId, String tag) {
-        this.resolution = resolution;
+    public ViffClient(int projectId, String tag) {
         this.projectId = projectId;
         this.tag = tag;
     }
@@ -28,7 +26,7 @@ public class ViffClient {
         this.driver = driver;
     }
 
-    public void addScreenshot() throws IOException {
+    public void addScreenshot(Resolution resolution) throws IOException {
         if(driver == null) {
             throw new RuntimeException("Need setting web driver before take screenshot!!");
         }
