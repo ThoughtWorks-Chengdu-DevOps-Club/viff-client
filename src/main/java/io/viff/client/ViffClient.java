@@ -4,6 +4,7 @@ import io.viff.client.model.DiffResultWrapper;
 import io.viff.client.model.Resolution;
 import io.viff.client.service.ViffRestClientManager;
 import io.viff.client.service.ViffRestService;
+import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import org.apache.commons.io.FileUtils;
@@ -36,29 +37,33 @@ public class ViffClient {
         this.driver = driver;
     }
 
-    public void addScreenshot(Resolution resolution) throws IOException {
+    public Response<ResponseBody> addScreenshot(Resolution resolution) throws IOException {
         if(driver == null) {
             throw new RuntimeException("Need setting web driver before take screenshot!!");
         }
 
-        takeScreenshot();
-        uploadScreenshot();
+        File screenshot = takeScreenshot();
+        return uploadScreenshot(screenshot);
     }
 
 
-    private void takeScreenshot() throws IOException {
+    private File takeScreenshot() throws IOException {
         File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         FileUtils.copyFile(screenshot, new File("temp.png"));
+        return screenshot;
     }
 
-    private void uploadScreenshot() throws IOException {
+    private Response<ResponseBody> uploadScreenshot(File screenshot) throws IOException {
+        RequestBody file = RequestBody.create(MediaType.parse("Picture"), screenshot);
         ViffRestService viffRestService = viffRestClientManager.getViffRestService();
         Map<String, RequestBody> map= new HashMap<String, RequestBody>();
+        map.put("Test", file);
         Call<ResponseBody> call = viffRestService.uploadScreenshot(map);
         Response<ResponseBody> response = call.execute();
         if(!response.isSuccess()){
             throw new RuntimeException("Bad Request");
         }
+        return response;
     }
 
     public DiffResultWrapper viff(String targetTag, int targetBuildNumber) {
