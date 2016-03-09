@@ -21,7 +21,7 @@ public class ViffClientTest {
     public void setUp() {
         driver = new FirefoxDriver();
         driver.get("http://www.baidu.com");
-        viffClient = new ViffClient(123, "tag");
+        viffClient = new ViffClient("127.0.0.1", 123, "tag");
         viffClient.setWebDriver(driver);
     }
 
