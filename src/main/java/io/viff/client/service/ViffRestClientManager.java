@@ -8,9 +8,6 @@ public class ViffRestClientManager {
     private Retrofit retrofit;
     private ViffRestService viffRestService;
 
-    private ViffRestClientManager() {
-    }
-
     public ViffRestClientManager(String apiAdrress) {
         retrofit = new Retrofit.Builder()
                 .baseUrl(apiAdrress)
