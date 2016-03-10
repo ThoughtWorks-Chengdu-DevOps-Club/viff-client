@@ -10,10 +10,12 @@ import org.junit.Test;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import retrofit2.Response;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import static com.github.dreamhead.moco.Moco.httpServer;
+import static com.github.dreamhead.moco.Moco.*;
 import static com.github.dreamhead.moco.Runner.runner;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -23,16 +25,19 @@ public class ViffClientTest {
     private FirefoxDriver driver;
     private ViffClient viffClient;
     private Runner runner;
+    private final static int RESOLUTION_HEIGHT = 860;
+    private final static int RESOLUTION_WIDTH = 1208;
+    private HttpServer server;
 
     @Before
     public void setUp() {
-        HttpServer server = httpServer(12306);
+        server = httpServer();
         runner = runner(server);
         runner.start();
 
         driver = new FirefoxDriver();
         driver.get("http://www.baidu.com");
-        viffClient = new ViffClient("http://127.0.0.1:12306", 123, "tag");
+        viffClient = new ViffClient("http://127.0.0.1:"+server.port(), 123, "tag");
         viffClient.setWebDriver(driver);
     }
 
@@ -44,13 +49,20 @@ public class ViffClientTest {
 
     @Test
     public void testAddScreeshot() throws IOException {
-        Response<ResponseBody> response = viffClient.addScreenshot(new Resolution(1208, 860));
+        server.post(by(uri("/upload"))).response(status(200));
+        Response<ResponseBody> response = viffClient.addScreenshot(new Resolution(RESOLUTION_WIDTH, RESOLUTION_HEIGHT));
         shouldSaveFileOnLocalDrive();
+        shouldBe1208With();
         shouldUploadAImage(response);
     }
 
     private void shouldSaveFileOnLocalDrive() {
         assertThat(new File("temp.png").exists(), is(true));
+    }
+
+    private void shouldBe1208With() throws IOException {
+        BufferedImage image = ImageIO.read(new File("temp.png"));
+        assertThat(image.getWidth(), is(RESOLUTION_WIDTH));
     }
 
     private void shouldUploadAImage(Response<ResponseBody> response){
