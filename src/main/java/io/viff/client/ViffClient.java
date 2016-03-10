@@ -23,14 +23,14 @@ import java.util.Map;
 
 public class ViffClient {
 
-    private int projectId;
+    private int projectID;
     private String tag;
     private WebDriver driver;
     private final ViffRestClientManager viffRestClientManager;
 
-    public ViffClient(String apiAddress, int projectId, String tag) {
+    public ViffClient(String apiAddress, int projectID, String tag) {
         viffRestClientManager = new ViffRestClientManager(apiAddress);
-        this.projectId = projectId;
+        this.projectID = projectID;
         this.tag = tag;
     }
 
@@ -62,6 +62,7 @@ public class ViffClient {
         map.put("Test", file);
         Call<ResponseBody> call = viffRestService.uploadScreenshot(map);
         Response<ResponseBody> response = call.execute();
+
         if(!response.isSuccess()){
             throw new RuntimeException("Bad Request");
         }
