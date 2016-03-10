@@ -8,6 +8,7 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -42,12 +43,13 @@ public class ViffClient {
             throw new RuntimeException("Need setting web driver before take screenshot!!");
         }
 
-        File screenshot = takeScreenshot();
+        File screenshot = takeScreenshot(resolution);
         return uploadScreenshot(screenshot);
     }
 
 
-    private File takeScreenshot() throws IOException {
+    private File takeScreenshot(Resolution resolution) throws IOException {
+        driver.manage().window().setSize(new Dimension(resolution.getWidth(), resolution.getHeight()));
         File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         FileUtils.copyFile(screenshot, new File("temp.png"));
         return screenshot;
