@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver;
 public class ViffBuilder {
     private ViffClient viffClient;
     private String apiAdrress;
-    private int projectID;
+    private String projectID;
     private String tag;
     private WebDriver driver;
 
@@ -20,7 +20,7 @@ public class ViffBuilder {
         return this;
     }
 
-    public ViffBuilder setProjectID(int projectID){
+    public ViffBuilder setProjectID(String projectID){
         this.projectID = projectID;
         return this;
     }
