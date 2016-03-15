@@ -7,6 +7,7 @@ import io.viff.client.service.ViffRestClientManager;
 import io.viff.client.service.ViffRestService;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.util.TextUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
@@ -52,7 +53,9 @@ public class ViffClient {
 
     private File takeScreenshot(Resolution resolution) throws IOException {
         driver.manage().window().setSize(new Dimension(resolution.getWidth(), resolution.getHeight()));
-        return ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        FileUtils.copyFile(screenshot, new File("temp.png"));
+        return screenshot;
     }
 
     private Response<UploadResponse> uploadScreenshot(File screenshot, String filename) throws IOException {
