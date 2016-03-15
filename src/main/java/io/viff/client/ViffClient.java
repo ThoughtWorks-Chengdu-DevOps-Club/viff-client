@@ -7,7 +7,6 @@ import io.viff.client.service.ViffRestService;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -44,29 +43,32 @@ public class ViffClient {
             throw new RuntimeException("Need setting web driver before take screenshot!!");
         }
 
-        File screenshot = takeScreenshot(resolution, filename);
-        return uploadScreenshot(screenshot);
+        File screenshot = takeScreenshot(resolution);
+        return uploadScreenshot(screenshot, filename);
     }
 
 
-    private File takeScreenshot(Resolution resolution, String filename) throws IOException {
+    private File takeScreenshot(Resolution resolution) throws IOException {
         driver.manage().window().setSize(new Dimension(resolution.getWidth(), resolution.getHeight()));
         File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        FileUtils.copyFile(screenshot, new File(filename));
         return screenshot;
     }
 
-    private Response<ResponseBody> uploadScreenshot(File screenshot) throws IOException {
-        RequestBody file = RequestBody.create(MediaType.parse("Picture"), screenshot);
+    private Response<ResponseBody> uploadScreenshot(File screenshot, String filename) throws IOException {
         ViffRestService viffRestService = viffRestClientManager.getViffRestService();
+
+        RequestBody file = RequestBody.create(MediaType.parse("image/*"), screenshot);
         Map<String, RequestBody> map= new HashMap<String, RequestBody>();
-        map.put("Test", file);
+        map.put(String.format("file\"; filename=\"%s", filename), file);
+
         Call<ResponseBody> call = viffRestService.uploadScreenshot(projectID, currentTag, map);
         Response<ResponseBody> response = call.execute();
 
         if(!response.isSuccess()){
             throw new RuntimeException("Bad Request");
         }
+        // TODO save build num and save
+
         return response;
     }
 
