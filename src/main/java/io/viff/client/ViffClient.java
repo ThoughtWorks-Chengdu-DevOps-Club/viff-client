@@ -7,6 +7,7 @@ import io.viff.client.service.ViffRestService;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import org.apache.http.util.TextUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -26,6 +27,7 @@ public class ViffClient {
     private String currentTag;
     private WebDriver driver;
     private final ViffRestClientManager viffRestClientManager;
+    private String buildNum;
 
     public ViffClient(String apiAddress, String projectID, String currentTag) {
         viffRestClientManager = new ViffRestClientManager(apiAddress);
@@ -50,24 +52,27 @@ public class ViffClient {
 
     private File takeScreenshot(Resolution resolution) throws IOException {
         driver.manage().window().setSize(new Dimension(resolution.getWidth(), resolution.getHeight()));
-        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        return screenshot;
+        return ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
     }
 
     private Response<ResponseBody> uploadScreenshot(File screenshot, String filename) throws IOException {
         ViffRestService viffRestService = viffRestClientManager.getViffRestService();
 
-        RequestBody file = RequestBody.create(MediaType.parse("image/*"), screenshot);
-        Map<String, RequestBody> map= new HashMap<String, RequestBody>();
-        map.put(String.format("file\"; filename=\"%s", filename), file);
+        Map<String, RequestBody> map = generateMultipleFile(screenshot, filename);
 
-        Call<ResponseBody> call = viffRestService.uploadScreenshot(projectID, currentTag, map);
-        Response<ResponseBody> response = call.execute();
+        Response<ResponseBody> response;
+        if (TextUtils.isEmpty(buildNum)) {
+            Call<ResponseBody> call = viffRestService.uploadScreenshot(projectID, currentTag, map);
+            buildNum = "1";
+            response = call.execute();
+        } else  {
+            Call<ResponseBody> call = viffRestService.uploadScreenshotWithBuildNumber(projectID, currentTag, buildNum, map);
+            response = call.execute();
+        }
 
         if(!response.isSuccess()){
             throw new RuntimeException("Bad Request");
         }
-        // TODO save build num and save
 
         return response;
     }
@@ -78,6 +83,13 @@ public class ViffClient {
 
     public DiffResultWrapper viff(String targetTag, String targetBuildNumberAlias){
         return null;
+    }
+
+    private Map<String, RequestBody> generateMultipleFile(File screenshot, String filename) {
+        RequestBody file = RequestBody.create(MediaType.parse("image/*"), screenshot);
+        Map<String, RequestBody> map= new HashMap<String, RequestBody>();
+        map.put(String.format("file\"; filename=\"%s", filename), file);
+        return map;
     }
 
 }

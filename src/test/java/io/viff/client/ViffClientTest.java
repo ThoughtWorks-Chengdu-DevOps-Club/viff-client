@@ -37,7 +37,7 @@ public class ViffClientTest {
 
         driver = new FirefoxDriver();
         driver.get("http://www.baidu.com");
-        viffClient = new ViffClient("http://127.0.0.1:"+server.port(), 123, "tag");
+        viffClient = new ViffClient("http://127.0.0.1:"+server.port(), "testProject", "tag");
         viffClient.setWebDriver(driver);
     }
 
@@ -49,8 +49,8 @@ public class ViffClientTest {
 
     @Test
     public void testAddScreeshot() throws IOException {
-        server.post(by(uri("/upload"))).response(status(200));
-        Response<ResponseBody> response = viffClient.addScreenshot(new Resolution(RESOLUTION_WIDTH, RESOLUTION_HEIGHT));
+        server.post(match(uri("/upload/.*"))).response(status(200));
+        Response<ResponseBody> response = viffClient.addScreenshot(new Resolution(RESOLUTION_WIDTH, RESOLUTION_HEIGHT), "test");
         shouldSaveFileOnLocalDrive();
         shouldBe1208With();
         shouldUploadAImage(response);
