@@ -2,11 +2,11 @@ package io.viff.client;
 
 import io.viff.client.model.DiffResultWrapper;
 import io.viff.client.model.Resolution;
+import io.viff.client.service.HTTPResponse.UploadResponse;
 import io.viff.client.service.ViffRestClientManager;
 import io.viff.client.service.ViffRestService;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import org.apache.http.util.TextUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
@@ -39,7 +39,7 @@ public class ViffClient {
         this.driver = driver;
     }
 
-    public Response<ResponseBody> addScreenshot(Resolution resolution, String filename) throws IOException {
+    public Response<UploadResponse> addScreenshot(Resolution resolution, String filename) throws IOException {
         if(driver == null) {
             // TODO read configure to generate web driver
             throw new RuntimeException("Need setting web driver before take screenshot!!");
@@ -55,18 +55,18 @@ public class ViffClient {
         return ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
     }
 
-    private Response<ResponseBody> uploadScreenshot(File screenshot, String filename) throws IOException {
+    private Response<UploadResponse> uploadScreenshot(File screenshot, String filename) throws IOException {
         ViffRestService viffRestService = viffRestClientManager.getViffRestService();
 
         Map<String, RequestBody> map = generateMultipleFile(screenshot, filename);
 
-        Response<ResponseBody> response;
+        Response<UploadResponse> response;
         if (TextUtils.isEmpty(buildNum)) {
-            Call<ResponseBody> call = viffRestService.uploadScreenshot(projectID, currentTag, map);
-            buildNum = "1";
+            Call<UploadResponse> call = viffRestService.uploadScreenshot(projectID, currentTag, map);
             response = call.execute();
+            buildNum = String.valueOf(response.body().getBuildNumber());
         } else  {
-            Call<ResponseBody> call = viffRestService.uploadScreenshotWithBuildNumber(projectID, currentTag, buildNum, map);
+            Call<UploadResponse> call = viffRestService.uploadScreenshotWithBuildNumber(projectID, currentTag, buildNum, map);
             response = call.execute();
         }
 

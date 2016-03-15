@@ -3,6 +3,7 @@ package io.viff.client;
 import com.github.dreamhead.moco.HttpServer;
 import com.github.dreamhead.moco.Runner;
 import io.viff.client.model.Resolution;
+import io.viff.client.service.HTTPResponse.UploadResponse;
 import okhttp3.ResponseBody;
 import org.junit.After;
 import org.junit.Before;
@@ -49,8 +50,8 @@ public class ViffClientTest {
 
     @Test
     public void testAddScreeshot() throws IOException {
-        server.post(match(uri("/upload/.*"))).response(status(200));
-        Response<ResponseBody> response = viffClient.addScreenshot(new Resolution(RESOLUTION_WIDTH, RESOLUTION_HEIGHT), "test");
+        server.post(match(uri("/upload/.*"))).response(toJson(new UploadResponse()));
+        Response<UploadResponse> response = viffClient.addScreenshot(new Resolution(RESOLUTION_WIDTH, RESOLUTION_HEIGHT), "test");
         shouldSaveFileOnLocalDrive();
         shouldBe1208With();
         shouldUploadAImage(response);
@@ -65,7 +66,7 @@ public class ViffClientTest {
         assertThat(image.getWidth(), is(RESOLUTION_WIDTH));
     }
 
-    private void shouldUploadAImage(Response<ResponseBody> response){
+    private void shouldUploadAImage(Response<UploadResponse> response){
         assertThat(response.isSuccess(), is(true));
     }
 }
