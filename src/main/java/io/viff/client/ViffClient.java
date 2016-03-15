@@ -24,34 +24,35 @@ import java.util.Map;
 public class ViffClient {
 
     private String projectID;
-    private String tag;
+    private String currentTag;
     private WebDriver driver;
     private final ViffRestClientManager viffRestClientManager;
 
-    public ViffClient(String apiAddress, String projectID, String tag) {
+    public ViffClient(String apiAddress, String projectID, String currentTag) {
         viffRestClientManager = new ViffRestClientManager(apiAddress);
         this.projectID = projectID;
-        this.tag = tag;
+        this.currentTag = currentTag;
     }
 
     public void setWebDriver(WebDriver driver) {
         this.driver = driver;
     }
 
-    public Response<ResponseBody> addScreenshot(Resolution resolution) throws IOException {
+    public Response<ResponseBody> addScreenshot(Resolution resolution, String filename) throws IOException {
         if(driver == null) {
+            // TODO read configure to generate web driver
             throw new RuntimeException("Need setting web driver before take screenshot!!");
         }
 
-        File screenshot = takeScreenshot(resolution);
+        File screenshot = takeScreenshot(resolution, filename);
         return uploadScreenshot(screenshot);
     }
 
 
-    private File takeScreenshot(Resolution resolution) throws IOException {
+    private File takeScreenshot(Resolution resolution, String filename) throws IOException {
         driver.manage().window().setSize(new Dimension(resolution.getWidth(), resolution.getHeight()));
         File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        FileUtils.copyFile(screenshot, new File("temp.png"));
+        FileUtils.copyFile(screenshot, new File(filename));
         return screenshot;
     }
 
@@ -60,7 +61,7 @@ public class ViffClient {
         ViffRestService viffRestService = viffRestClientManager.getViffRestService();
         Map<String, RequestBody> map= new HashMap<String, RequestBody>();
         map.put("Test", file);
-        Call<ResponseBody> call = viffRestService.uploadScreenshot(projectID, tag, map);
+        Call<ResponseBody> call = viffRestService.uploadScreenshot(projectID, currentTag, map);
         Response<ResponseBody> response = call.execute();
 
         if(!response.isSuccess()){
