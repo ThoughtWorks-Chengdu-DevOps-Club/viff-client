@@ -2,6 +2,7 @@ package io.viff.client;
 
 import io.viff.client.model.DiffResultWrapper;
 import io.viff.client.model.Resolution;
+import io.viff.client.service.CallBack.UploadCallback;
 import io.viff.client.service.HTTPResponse.UploadResponse;
 import io.viff.client.service.ViffRestClientManager;
 import io.viff.client.service.ViffRestService;
@@ -14,6 +15,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.io.File;
@@ -40,14 +42,14 @@ public class ViffClient {
         this.driver = driver;
     }
 
-    public Response<UploadResponse> addScreenshot(Resolution resolution, String filename) throws IOException {
+    public void addScreenshot(Resolution resolution, String filename) throws IOException {
         if(driver == null) {
             // TODO read configure to generate web driver
             throw new RuntimeException("Need setting web driver before take screenshot!!");
         }
 
         File screenshot = takeScreenshot(resolution);
-        return uploadScreenshot(screenshot, filename);
+        uploadScreenshot(screenshot, filename);
     }
 
 
@@ -58,26 +60,23 @@ public class ViffClient {
         return screenshot;
     }
 
-    private Response<UploadResponse> uploadScreenshot(File screenshot, String filename) throws IOException {
+    private void uploadScreenshot(File screenshot, String filename) throws IOException {
         ViffRestService viffRestService = viffRestClientManager.getViffRestService();
 
         Map<String, RequestBody> map = generateMultipleFile(screenshot, filename);
 
-        Response<UploadResponse> response;
         if (TextUtils.isEmpty(buildNum)) {
             Call<UploadResponse> call = viffRestService.uploadScreenshot(projectID, currentTag, map);
-            response = call.execute();
+            Response<UploadResponse> response = call.execute();
+            if (!response.isSuccess()) {
+                throw new RuntimeException("Bad Request");
+            }
             buildNum = String.valueOf(response.body().getBuildNumber());
-        } else  {
+        } else {
             Call<UploadResponse> call = viffRestService.uploadScreenshotWithBuildNumber(projectID, currentTag, buildNum, map);
-            response = call.execute();
+            call.enqueue(new UploadCallback());
         }
 
-        if(!response.isSuccess()){
-            throw new RuntimeException("Bad Request");
-        }
-
-        return response;
     }
 
     public DiffResultWrapper viff(String targetTag, int targetBuildNumber) {
