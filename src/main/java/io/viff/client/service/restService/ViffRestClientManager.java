@@ -1,4 +1,4 @@
-package io.viff.client.service;
+package io.viff.client.service.restService;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

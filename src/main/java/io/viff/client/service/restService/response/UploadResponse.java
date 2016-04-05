@@ -1,4 +1,4 @@
-package io.viff.client.service.HTTPResponse;
+package io.viff.client.service.restService.response;
 
 
 public class UploadResponse {

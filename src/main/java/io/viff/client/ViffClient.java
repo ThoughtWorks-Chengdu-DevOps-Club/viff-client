@@ -2,20 +2,16 @@ package io.viff.client;
 
 import io.viff.client.model.DiffResultWrapper;
 import io.viff.client.model.Resolution;
-import io.viff.client.service.CallBack.UploadCallback;
-import io.viff.client.service.HTTPResponse.UploadResponse;
-import io.viff.client.service.ViffRestClientManager;
-import io.viff.client.service.ViffRestService;
+import io.viff.client.service.restService.callback.UploadCallback;
+import io.viff.client.service.restService.response.UploadResponse;
+import io.viff.client.service.restService.ViffRestClientManager;
+import io.viff.client.service.restService.ViffRestService;
+import io.viff.client.service.ViffService;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import org.apache.commons.io.FileUtils;
 import org.apache.http.util.TextUtils;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.io.File;
@@ -28,9 +24,9 @@ public class ViffClient {
 
     private String projectID;
     private String currentTag;
-    private WebDriver driver;
     private final ViffRestClientManager viffRestClientManager;
     private String buildNum;
+    private WebDriver driver;
 
     public ViffClient(String apiAddress, String projectID, String currentTag) {
         viffRestClientManager = new ViffRestClientManager(apiAddress);
@@ -39,6 +35,7 @@ public class ViffClient {
     }
 
     public void setWebDriver(WebDriver driver) {
+
         this.driver = driver;
     }
 
@@ -48,16 +45,7 @@ public class ViffClient {
             throw new RuntimeException("Need setting web driver before take screenshot!!");
         }
 
-        File screenshot = takeScreenshot(resolution);
-        uploadScreenshot(screenshot, filename);
-    }
-
-
-    private File takeScreenshot(Resolution resolution) throws IOException {
-        driver.manage().window().setSize(new Dimension(resolution.getWidth(), resolution.getHeight()));
-        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        FileUtils.copyFile(screenshot, new File("temp.png"));
-        return screenshot;
+        uploadScreenshot(ViffService.takeScreenshot(resolution, driver), filename);
     }
 
     private void uploadScreenshot(File screenshot, String filename) throws IOException {
@@ -73,7 +61,7 @@ public class ViffClient {
             }
             buildNum = String.valueOf(response.body().getBuildNumber());
         } else {
-            Call<UploadResponse> call = viffRestService.uploadScreenshotWithBuildNumber(projectID, currentTag, buildNum, map);
+            Call<UploadResponse> call = viffRestService.uploadScreenshot(projectID, currentTag, buildNum, map);
             call.enqueue(new UploadCallback());
         }
 
