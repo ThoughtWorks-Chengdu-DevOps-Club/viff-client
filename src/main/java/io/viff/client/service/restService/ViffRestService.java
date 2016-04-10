@@ -1,5 +1,6 @@
 package io.viff.client.service.restService;
 
+import io.viff.client.service.restService.request.ViffRequest;
 import io.viff.client.service.restService.response.UploadResponse;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -16,8 +17,8 @@ public interface ViffRestService {
 
     @Multipart
     @POST("/upload/{projectID}/{tag}/{buildNumber}")
-    Call<UploadResponse> uploadScreenshot(@Path("projectID") String projectID, @Path("tag") String tag, @Part("buildNumber") String buildNumber, @Part MultipartBody.Part file);
+    Call<UploadResponse> uploadScreenshot(@Path("projectID") String projectID, @Path("tag") String tag, @Part("buildNumber") int buildNumber, @Part MultipartBody.Part file);
 
-    @GET("/compare")
-    Call<ResponseBody> viff(@Query("from") String from, @Query("to") String to);
+    @POST("/viff")
+    Call<ResponseBody> viff(@Body ViffRequest viffRequest);
 }

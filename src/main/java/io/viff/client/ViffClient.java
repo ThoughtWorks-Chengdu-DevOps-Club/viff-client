@@ -5,11 +5,12 @@ import io.viff.client.model.Resolution;
 import io.viff.client.service.ViffService;
 import io.viff.client.service.restService.ViffRestClientManager;
 import io.viff.client.service.restService.ViffRestService;
+import io.viff.client.service.restService.request.ViffRequest;
 import io.viff.client.service.restService.response.UploadResponse;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import org.apache.http.util.TextUtils;
+import okhttp3.ResponseBody;
 import org.openqa.selenium.WebDriver;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -22,12 +23,13 @@ public class ViffClient {
 
     private String projectID;
     private String currentTag;
-    private final ViffRestClientManager viffRestClientManager;
-    private String buildNum;
+    private int buildNum;
     private WebDriver driver;
+    private final ViffRestService viffRestService;
 
     public ViffClient(String apiAddress, String projectID, String currentTag) {
-        viffRestClientManager = new ViffRestClientManager(apiAddress);
+        ViffRestClientManager viffRestClientManager = new ViffRestClientManager(apiAddress);
+        viffRestService = viffRestClientManager.getViffRestService();
         this.projectID = projectID;
         this.currentTag = currentTag;
     }
@@ -47,17 +49,17 @@ public class ViffClient {
     }
 
     private void uploadScreenshot(File screenshot, String filename) throws IOException {
-        ViffRestService viffRestService = viffRestClientManager.getViffRestService();
+
 
         MultipartBody.Part file = MultipartBody.Part.createFormData("file", filename, RequestBody.create(MediaType.parse("image/*"), screenshot));
 
-        if (TextUtils.isEmpty(buildNum)) {
+        if (buildNum != 0) {
             Call<UploadResponse> call = viffRestService.uploadScreenshot(projectID, currentTag, file);
             Response<UploadResponse> response = call.execute();
             if (!response.isSuccessful()) {
                 throw new RuntimeException("Bad Request");
             }
-            buildNum = String.valueOf(response.body().getBuildNumber());
+            buildNum = response.body().getBuildNumber();
         } else {
             Call<UploadResponse> call = viffRestService.uploadScreenshot(projectID, currentTag, buildNum, file);
             // TODO make it async
@@ -70,7 +72,10 @@ public class ViffClient {
 
     }
 
-    public DiffResultWrapper viff(String targetTag, int targetBuildNumber) {
+    public DiffResultWrapper viff(String targetTag, int targetBuildNumber) throws IOException {
+        ViffRequest viffRequest = new ViffRequest(projectID, currentTag, buildNum, targetTag, targetBuildNumber);
+        Call<ResponseBody> viff = viffRestService.viff(viffRequest);
+        viff.execute();
         return null;
     }
 
