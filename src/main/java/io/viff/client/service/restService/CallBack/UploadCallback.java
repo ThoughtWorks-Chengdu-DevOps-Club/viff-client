@@ -9,7 +9,7 @@ import retrofit2.Response;
 public class UploadCallback implements Callback<UploadResponse> {
     @Override
     public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
-        if (!response.isSuccess()) {
+        if (!response.isSuccessful()) {
             throw new RuntimeException("Bad Request!");
         }
     }
