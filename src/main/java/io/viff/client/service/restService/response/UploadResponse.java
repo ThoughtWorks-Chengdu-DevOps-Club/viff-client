@@ -4,6 +4,7 @@ package io.viff.client.service.restService.response;
 public class UploadResponse {
     private String url;
     private String tag;
+    private String project;
     private Integer buildNumber;
 
 
@@ -20,4 +21,7 @@ public class UploadResponse {
         return buildNumber;
     }
 
+    public String getProject() {
+        return project;
+    }
 }

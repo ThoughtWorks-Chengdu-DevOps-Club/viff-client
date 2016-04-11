@@ -7,49 +7,55 @@ import io.viff.client.service.restService.response.UploadResponse;
 import org.junit.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import static com.github.dreamhead.moco.Moco.*;
 import static com.github.dreamhead.moco.Runner.runner;
 
 public class ViffClientTest {
 
-    private static FirefoxDriver driver;
-    private static ViffClient viffClient;
-    private static Runner runner;
-    private final static int RESOLUTION_HEIGHT = 860;
-    private final static int RESOLUTION_WIDTH = 1208;
-    private static HttpServer server;
+    private ViffClient viffClient;
+    private Runner runner;
+    private final int RESOLUTION_HEIGHT = 860;
+    private final int RESOLUTION_WIDTH = 1208;
+    private HttpServer server;
 
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
         server = httpServer();
         runner = runner(server);
         runner.start();
 
-        driver = new FirefoxDriver();
-        driver.get("http://www.baidu.com");
         viffClient = new ViffClient("http://127.0.0.1:"+server.port(), "testProject", "tag");
-        viffClient.setWebDriver(driver);
     }
 
-    @AfterClass
-    public static void tearDown() {
-        driver.close();
+    @After
+    public void tearDown() {
         runner.stop();
         viffClient = null;
     }
 
     @Test
     public void testAddScreenshot() throws IOException {
-        server.post(match(uri("/upload/.*"))).response(toJson(new UploadResponse()));
+        FirefoxDriver driver = new FirefoxDriver();
+        driver.get("http://www.baidu.com");
+        viffClient.setWebDriver(driver);
+
+        URL url = this.getClass().getClassLoader().getResource("uploadResponse.json");
+        assert url != null;
+        server.post(match(uri("/file/upload/.*"))).response(file(url.getPath()));
         viffClient.addScreenshot(new Resolution(RESOLUTION_WIDTH, RESOLUTION_HEIGHT), "test");
+        driver.close();
     }
 
 
     @Test
-    public void testViff() {
-        server.post(by(uri("/viff"))).response("ok");
-        viffClient.viff("dev", "latest");
+    public void testViff() throws IOException {
+        URL url = this.getClass().getClassLoader().getResource("viffResponse.json");
+        assert url != null;
+        server.post(by(uri("/viff"))).response(file(url.getPath()));
+        viffClient.viff("dev", 2);
     }
 }

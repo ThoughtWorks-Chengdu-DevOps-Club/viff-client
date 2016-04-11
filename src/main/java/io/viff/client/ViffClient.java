@@ -7,6 +7,7 @@ import io.viff.client.service.restService.ViffRestClientManager;
 import io.viff.client.service.restService.ViffRestService;
 import io.viff.client.service.restService.request.ViffRequest;
 import io.viff.client.service.restService.response.UploadResponse;
+import io.viff.client.service.restService.response.ViffResponse;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -53,7 +54,7 @@ public class ViffClient {
 
         MultipartBody.Part file = MultipartBody.Part.createFormData("file", filename, RequestBody.create(MediaType.parse("image/*"), screenshot));
 
-        if (buildNum != 0) {
+        if (buildNum == 0) {
             Call<UploadResponse> call = viffRestService.uploadScreenshot(projectID, currentTag, file);
             Response<UploadResponse> response = call.execute();
             if (!response.isSuccessful()) {
@@ -74,8 +75,8 @@ public class ViffClient {
 
     public DiffResultWrapper viff(String targetTag, int targetBuildNumber) throws IOException {
         ViffRequest viffRequest = new ViffRequest(projectID, currentTag, buildNum, targetTag, targetBuildNumber);
-        Call<ResponseBody> viff = viffRestService.viff(viffRequest);
-        viff.execute();
+        Call<ViffResponse> viff = viffRestService.viff(viffRequest);
+        Response<ViffResponse> response = viff.execute();
         return null;
     }
 
