@@ -1,0 +1,21 @@
+{
+  "metaData": {
+    "projectID": "viff",
+    "tagName": "dev",
+    "buildNumber": 1,
+    "targetTagName": "dev",
+    "targetBuildNumber": 2
+  },
+  "viffResult": [
+    {
+      "imageID": "1.png",
+      "similarity": 1,
+      "originImageURL": "/Users/yswen/tmp/viff/dev/1/1.png",
+      "targetImageURL": "/Users/yswen/tmp/viff/dev/2/1.png",
+      "viffImageURL": "/Users/yswen/project/viff-rev/viff-storage/viff__aT81PjhBOGZwajFuTUVVaQ==.png",
+      "new": false,
+      "same": true,
+      "removed": false
+    }
+  ]
+}
