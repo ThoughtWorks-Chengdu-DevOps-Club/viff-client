@@ -4,50 +4,77 @@ import java.util.List;
 
 
 public class DiffResultWrapper {
-    private String currentTag;
-    private String currentBuildNumber;
-    private String targetTag;
-    private String targetBuildNumber;
+    private String imageID;
+    private boolean isNew;
+    private boolean isSame;
+    private boolean isRemoved;
+    private double similarity;
+    private String originImageURL;
+    private String targetImageURL;
+    private String viffImageURL;
 
-    private List<DiffResult> resultList;
 
-    public String getCurrentTag() {
-        return currentTag;
+    public boolean isRemoved() {
+        return isRemoved;
     }
 
-    public void setCurrentTag(String currentTag) {
-        this.currentTag = currentTag;
+    public void setRemoved(boolean removed) {
+        isRemoved = removed;
     }
 
-    public String getCurrentBuildNumber() {
-        return currentBuildNumber;
+    public String getImageID() {
+        return imageID;
     }
 
-    public void setCurrentBuildNumber(String currentBuildNumber) {
-        this.currentBuildNumber = currentBuildNumber;
+    public void setImageID(String imageID) {
+        this.imageID = imageID;
     }
 
-    public String getTargetTag() {
-        return targetTag;
+    public boolean isNew() {
+        return isNew;
     }
 
-    public void setTargetTag(String targetTag) {
-        this.targetTag = targetTag;
+    public void setNew(boolean aNew) {
+        isNew = aNew;
     }
 
-    public String getTargetBuildNumber() {
-        return targetBuildNumber;
+    public boolean isSame() {
+        return isSame;
     }
 
-    public void setTargetBuildNumber(String targetBuildNumber) {
-        this.targetBuildNumber = targetBuildNumber;
+    public void setSame(boolean same) {
+        isSame = same;
     }
 
-    public List<DiffResult> getResultList() {
-        return resultList;
+    public double getSimilarity() {
+        return similarity;
     }
 
-    public void setResultList(List<DiffResult> resultList) {
-        this.resultList = resultList;
+    public void setSimilarity(double similarity) {
+        this.similarity = similarity;
+    }
+
+    public String getOriginImageURL() {
+        return originImageURL;
+    }
+
+    public void setOriginImageURL(String originImageURL) {
+        this.originImageURL = originImageURL;
+    }
+
+    public String getTargetImageURL() {
+        return targetImageURL;
+    }
+
+    public void setTargetImageURL(String targetImageURL) {
+        this.targetImageURL = targetImageURL;
+    }
+
+    public String getViffImageURL() {
+        return viffImageURL;
+    }
+
+    public void setViffImageURL(String viffImageURL) {
+        this.viffImageURL = viffImageURL;
     }
 }

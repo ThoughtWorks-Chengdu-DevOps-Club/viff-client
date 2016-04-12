@@ -11,13 +11,13 @@ import io.viff.client.service.restService.response.ViffResponse;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import org.openqa.selenium.WebDriver;
 import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 
 public class ViffClient {
@@ -73,15 +73,18 @@ public class ViffClient {
 
     }
 
-    public DiffResultWrapper viff(String targetTag, int targetBuildNumber) throws IOException {
+    public List<DiffResultWrapper> viff(String targetTag, int targetBuildNumber) throws IOException {
         ViffRequest viffRequest = new ViffRequest(projectID, currentTag, buildNum, targetTag, targetBuildNumber);
         Call<ViffResponse> viff = viffRestService.viff(viffRequest);
         Response<ViffResponse> response = viff.execute();
-        return null;
+        if(!response.isSuccessful()){
+            throw new RuntimeException("Bad Request");
+        }
+        return response.body().getViffResult();
     }
 
-    public DiffResultWrapper viff(String targetTag, String targetBuildNumberAlias){
-        return null;
+    public List<DiffResultWrapper> viff(String targetTag, String targetBuildNumberAlias){
+        throw new RuntimeException("method not support yet");
     }
 
 }
